@@ -24,16 +24,16 @@ public class Rectangulo {
     }
 
     public void setAncho(int ancho) {
-        if (longitud > 0 && longitud < 20) {
+        if (ancho > 0 && ancho < 20) {
             this.ancho = ancho;
         }
     }
 
-    public int calculoArea(int longitud, int ancho){
-        return longitud * ancho;
+    public int calculoArea(){
+        return this.longitud * this.ancho;
     }
 
-    public int calculoPerimetro(int longitud, int ancho){
-        return longitud^2 + ancho^2;
+    public int calculoPerimetro(){
+        return 2 * (this.longitud + this.ancho);
     }
 }
