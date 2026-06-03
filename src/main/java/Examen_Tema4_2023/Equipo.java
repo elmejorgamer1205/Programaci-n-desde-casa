@@ -45,7 +45,7 @@ public class Equipo {
                 listaJugadores[contadorJugadores - 1] = null; // Vacía la última casilla porque todos se han movido a la izquierda
                 contadorJugadores--; // Resta 1 al total de jugadores
                 System.out.println("Jugador eliminado con éxito.");
-                return; // Corta la ejecución del método porque ya hemos terminado
+                return; // Corta la ejecución del metodo porque ya hemos terminado
             }
         }
         System.out.println("No se encontró al jugador en este equipo."); // Si el bucle termina y no encontró a nadie, muestra esto
