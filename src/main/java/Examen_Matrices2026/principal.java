@@ -17,7 +17,7 @@ public class principal {
                 {4, 3, 2, 1}
         };
 
-        boolean[][] tableroOculto = new boolean[N][N]; // Por defecto se inicializa en false (todo oculto)
+        boolean[][] tableroOculto = new boolean[N][N]; // Por defecto se inicializa en "false" (tódo oculto)
 
         boolean juegoTerminado = false;
 
