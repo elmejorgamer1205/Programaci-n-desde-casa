@@ -3,7 +3,13 @@ import java.time.YearMonth;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Clase principal que actúa como gestor y punto de entrada de la aplicación.
+ * Demuestra el uso de la API Stream de Java para procesar colecciones de empleados
+ * y realizar operaciones estadísticas y de búsqueda.
+ */
 public class Principal {
+    // Almacén principal de datos en memoria
     private List<Empleado> empleados;
 
     public Principal() {
@@ -16,12 +22,19 @@ public class Principal {
 
     public static void main(String[] args) {
         Principal principal = new Principal();
+
+        // Genera datos aleatorios simulados para probar la aplicación
         principal.inicializarEmpleados();
 
-        // Este empleado obviamente existe
+        /* * BATERÍA DE PRUEBAS
+         * A continuación se ejecutan todos los requerimientos solicitados,
+         * imprimiendo los resultados por consola.
+         */
+
+        // Este empleado obviamente existe porque cogemos el DNI del primero de la lista
         principal.buscarEmpleado(principal.empleados.getFirst().getDni());
 
-        // Este empleado no existe
+        // Este empleado no existe (DNI falso a propósito)
         principal.buscarEmpleado("12345678A");
         System.out.println();
 
@@ -50,7 +63,11 @@ public class Principal {
         System.out.println();
     }
 
-    // 1. Buscar empleado por DNI
+    /**
+     * 1. Buscar empleado por DNI
+     * Utiliza Streams para encontrar la primera coincidencia exacta del DNI.
+     * @param dni El DNI exacto a buscar (ignora mayúsculas/minúsculas).
+     */
     private void buscarEmpleado(String dni) {
         empleados.stream()
                 // Filtramos para dejar pasar solo al empleado con el DNI exacto
@@ -64,7 +81,10 @@ public class Principal {
                 );
     }
 
-    // 2. Recuento por departamentos
+    /**
+     * 2. Recuento por departamentos
+     * Agrupa y cuenta a los empleados basándose en su enum Departamento.
+     */
     private void mostrarNumeroEmpleadosPorDepartamento() {
         Map<Departamento, Long> recuento = empleados.stream()
                 // Agrupamos usando como clave el Departamento, y como valor contamos cuántos hay
@@ -74,7 +94,12 @@ public class Principal {
         recuento.forEach((dept, cantidad) -> System.out.println(dept + ": " + cantidad));
     }
 
-    // 3. Retención de los empleados nuevos
+    /**
+     * 3. Retención media de los empleados nuevos
+     * Calcula la media aritmética del porcentaje de retención de la última nómina,
+     * pero solo para aquellos empleados que entraron hace menos de 1 año.
+     * * @return La media de retención, o 0.0 si no hay empleados nuevos.
+     */
     private double porcentajeRetencionTrabajadoresNuevos() {
         YearMonth haceUnAno = YearMonth.now().minusYears(1);
 
@@ -89,19 +114,22 @@ public class Principal {
                 .orElse(0.0);
     }
 
-    // 4. Salario máximo
+    /*
+     * 4. Salario máximo
+     * Este proceso requiere dos pasadas (o pasos) con Streams para resolverse:
+     * El primer paso localiza cuál es la cifra monetaria más alta.
+     * El segundo paso busca quiénes son las personas que cobran exactamente esa cifra.
+     */
     private void empleadosQueMasCobran() {
         // PASO 1: Descubrir cuál es el salario neto más alto de toda la empresa
         double maxSalarioNeto = empleados.stream()
-                // Mapeamos a cada empleado a su salario neto usando el método auxiliar
                 .mapToDouble(this::calcularSalarioNetoAuxiliar)
-                // Nos quedamos con el valor máximo
                 .max()
                 .orElse(0.0);
 
         System.out.printf("Empleados que más cobran (%.2f€):%n", maxSalarioNeto);
 
-        // PASO 2: Recorrer de nuevo e imprimir a los empleados que cobren exactamente ese máximo (por si hay empate)
+        // PASO 2: Recorrer de nuevo e imprimir a los empleados que cobren ese máximo (cubre empates)
         empleados.stream()
                 .filter(empleado -> calcularSalarioNetoAuxiliar(empleado) == maxSalarioNeto)
                 .forEach(e -> System.out.println(e.getNombre() + " " + e.getApellido() + " (" + e.getDni() + ") - Departamento: " + e.getDepartamento()));
@@ -113,10 +141,13 @@ public class Principal {
         return ultima.getSalarioBase() * (1 - (ultima.getRetencion() / 100));
     }
 
-    // 5. Coste salarial total
+    /**
+     * 5. Coste salarial total para un mes concreto.
+     * * @param fecha Mes y año del que se desea extraer el coste total de salarios brutos.
+     */
     private void costeTotalSalarios(YearMonth fecha) {
         double costeTotal = empleados.stream()
-                // flatMap coge las listas de nóminas de todos los empleados y las "aplana" en un único flujo gigante de nóminas
+                // flatMap coge las listas de nóminas de todos los empleados y las "aplana" en un único flujo gigante
                 .flatMap(empleado -> empleado.getNominas().stream())
                 // Filtramos para dejar pasar solo las nóminas que coincidan con la fecha pedida
                 .filter(nomina -> nomina.getMesNomina().equals(fecha))
@@ -125,11 +156,15 @@ public class Principal {
                 // Sumamos todo el dinero
                 .sum();
 
-        // Se usa %d/%d para extraer el mes y el año de la fecha dada en el formato que pide el ejemplo
+        // Se usa %d/%d para extraer el mes y el año de la fecha dada
         System.out.printf("El coste total para la fecha %d/%d es %.2f€%n", fecha.getMonthValue(), fecha.getYear(), costeTotal);
     }
 
-    // 6. Listado por antigüedad
+    /**
+     * 6. Listado por antigüedad
+     * Ordena a todos los empleados del más veterano al más nuevo.
+     * En caso de empate en la fecha, desempata por orden alfabético del apellido.
+     */
     private void mostrarTodosEmpleadosOrdenados() {
         empleados.stream()
                 // Comparamos primero por la fecha de la primera nómina, y si empatan, desempatamos por el apellido
@@ -142,10 +177,15 @@ public class Principal {
                 ));
     }
 
+    /*
+     * Método de utilidad (MOCKING DATA).
+     * Genera datos aleatorios para poblar la lista de empleados y sus nóminas,
+     * permitiendo que los métodos de búsqueda y cálculo devuelvan resultados reales.
+     */
     public void inicializarEmpleados() {
         Random random = new Random();
 
-        // Configuración para generar 5 empleados por cada departamento
+        // Configuración para generar empleados por cada departamento
         for (Departamento dept : Departamento.values()) {
             // Los departamentos tendrán entre 3 y 7 empleados
             int numEmpleados = random.nextInt(5) + 3;
@@ -163,9 +203,9 @@ public class Principal {
 
                 for (int m = 0; m < numNominas; m++) {
                     YearMonth mesNomina = mesInicio.plusMonths(m);
-                    // Salarios entre 1500 y 3500
+                    // Salarios aleatorios entre 1500 y 3500
                     double salarioBase = 1500 + (random.nextDouble() * 2000);
-                    // Retenciones entre 10% y 22%
+                    // Retenciones aleatorias entre 10% y 22%
                     double retencion = 10 + (random.nextDouble() * 12);
 
                     emp.getNominas().add(new Nomina(mesNomina, salarioBase, retencion));
