@@ -1,4 +1,4 @@
-package Examen_Tema4_2023;
+package Examen_POO2023;
 
 import Exceptions.MiEntradaSalidaException; // Importa tu excepción personalizada
 import io.MiEntradaSalida; // Importa tu clase de utilidades de lectura

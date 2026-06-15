@@ -1,4 +1,4 @@
-package Examen_Tema4_2023; // Indica en qué carpeta/paquete está guardado este archivo
+package Examen_POO2023; // Indica en qué carpeta/paquete está guardado este archivo
 
 public class Jugador {
 

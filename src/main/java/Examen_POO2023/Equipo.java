@@ -1,4 +1,4 @@
-package Examen_Tema4_2023;
+package Examen_POO2023;
 
 import java.util.Arrays; // Importamos esta librería por si usamos Arrays.toString() luego
 
